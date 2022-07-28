@@ -852,6 +852,15 @@ static void scan_eh_tab(scan_results &results, _Unwind_Action actions,
 #endif // !__USING_SJLJ_EXCEPTIONS__
     }  // there might be some tricky cases which break out of this loop
 
+    if (native_exception && actions == _UA_CLEANUP_PHASE) {
+      // This might happen for LTO binaries. Assume there is no handler and no
+      // cleanup needed in this stack frame, and continue unwinding the stack.
+      // We need to carefully test exception behavior with LTO.
+      // See https://github.com/yugabyte/yugabyte-db/issues/13064 for details.
+      results.reason = _URC_CONTINUE_UNWIND;
+      return;
+    }
+
     // It is possible that no eh table entry specify how to handle
     // this exception. By spec, terminate it immediately.
     call_terminate(native_exception, unwind_exception);
