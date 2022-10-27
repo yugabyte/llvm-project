@@ -200,7 +200,9 @@ static void RegisterGlobal(const Global *g) {
     ReportGlobal(*g, "Added");
   CHECK(flags()->report_globals);
   CHECK(AddrIsInMem(g->beg));
-  if (!AddrIsAlignedByGranularity(g->beg)) {
+  // Disabled by YugabyteDB team.
+  // See https://github.com/yugabyte/yugabyte-db/issues/14672 for details.
+  if (false && !AddrIsAlignedByGranularity(g->beg)) {
     Report("The following global variable is not properly aligned.\n");
     Report("This may happen if another global with the same name\n");
     Report("resides in another non-instrumented module.\n");
@@ -241,7 +243,11 @@ static void UnregisterGlobal(const Global *g) {
     ReportGlobal(*g, "Removed");
   CHECK(flags()->report_globals);
   CHECK(AddrIsInMem(g->beg));
-  CHECK(AddrIsAlignedByGranularity(g->beg));
+  if (false) {
+    // Disabled by YugabyteDB team.
+    // See https://github.com/yugabyte/yugabyte-db/issues/14672 for details.
+    CHECK(AddrIsAlignedByGranularity(g->beg));
+  }
   CHECK(AddrIsAlignedByGranularity(g->size_with_redzone));
   if (CanPoisonMemory())
     PoisonShadowForGlobal(g, 0);
