@@ -114,13 +114,13 @@ class DeadlockDetectorTLS {
  private:
   BV bv_;
   uptr epoch_;
-  uptr recursive_locks[64];
+  uptr recursive_locks[256];
   uptr n_recursive_locks;
   struct LockWithContext {
     u32 lock;
     u32 stk;
   };
-  LockWithContext all_locks_with_contexts_[64];
+  LockWithContext all_locks_with_contexts_[256];
   uptr n_all_locks_;
 };
 
