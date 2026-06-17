@@ -400,7 +400,13 @@ int DwarfInstructions<A, R>::stepWithDwarf(A &addressSpace, pint_t pc,
 
       // Return address is address after call site instruction, so setting IP to
       // that does simulates a return.
-      newRegisters.setIP(returnAddress);
+      //
+      // In case of this is frame of signal handler, the IP should be
+      // incremented, because the IP saved in the signal handler points to
+      // first non-executed instruction, while FDE/CIE expects IP to be after
+      // the first non-executed instruction.
+      // Also see: https://github.com/ClickHouse/libunwind/commit/ba533a7246a2686b0552061809612f503804d26b
+      newRegisters.setIP(returnAddress + cieInfo.isSignalFrame);
 
       // Simulate the step by replacing the register set with the new ones.
       registers = newRegisters;
